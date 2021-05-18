@@ -1,0 +1,131 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css"
+        integrity="sha512-P5MgMn1jBN01asBgU0z60Qk4QxiXo86+wlFahKrsQf37c9cro517WzVSPPV1tDKzhku2iJ2FVgL67wG03SGnNA=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap-reboot.min.css"
+        integrity="sha512-wV3xzHEw4kJUF4G0fyXSefKmUVhwwbOdZinJvOxmysxAXSZBl17porgPOcQBDBQTEwgGevxXGWAAQ/UPaSd0nw=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap-grid.min.css"
+        integrity="sha512-cKoGpmS4czjv58PNt1YTHxg0wUDlctZyp9KUxQpdbAft+XqnyKvDvcGX0QYCgCohQenOuyGSl8l1f7/+axAqyg=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css"
+        integrity="sha512-OdEXQYCOldjqUEsuMKsZRj93Ht23QRlhIb8E/X0sbwZhme8eUw6g8q7AdxGJKakcBbv7+/PX0Gc2btf7Ru8cZA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/regular.min.css"
+        integrity="sha512-Nqct4Jg8iYwFRs/C34hjAF5og5HONE2mrrUV1JZUswB+YU7vYSPyIjGMq+EAQYDmOsMuO9VIhKpRUa7GjRKVlg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css"
+        integrity="sha512-jQqzj2vHVxA/yCojT8pVZjKGOe9UmoYvnOuM/2sQ110vxiajBU+4WkyRs1ODMmd4AfntwUEV4J+VfM6DkfjLRg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css"
+        integrity="sha512-jQqzj2vHVxA/yCojT8pVZjKGOe9UmoYvnOuM/2sQ110vxiajBU+4WkyRs1ODMmd4AfntwUEV4J+VfM6DkfjLRg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid app-body">
+        <div class="card bg-light app-card mx-auto">
+            <div class="card-header text-center">
+                Compound Interest Calculator
+            </div>
+            <div class="card-body">
+                <form id="interest-calc">
+                    <div class="form-group">
+                        <label>Principal</label>
+                        <input class="form-control" required type="number" id="principal" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Interest rate</label>
+                        <input class="form-control" type="number" step="0.5" required id="interest_R" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Time in yrs</label>
+                        <input class="form-control" type="number" step="1" required id="time_t" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" class="form-control" disabled id="amount" value="0">
+                    </div>
+                </form>
+                <ul class="list-inline list-unstyled w-100">
+                    <li class="list-inline-item">
+                        <button class="btn btn-info" id="calc-interest">
+                            CALCULATE AMOUNT
+                        </button>
+                    </li>
+                    <li class="list-inline-item">
+                        <button class="btn btn-warning" id="reset">
+                            RESET FORM
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    .app-body {
+        height: 100vh;
+        background-color: #e2e2e2;
+    }
+
+    .app-card {
+        min-width: 28vw;
+        position: absolute;
+        top: 12%;
+        left: 35%;
+    }
+</style>
+<script>
+    const servers = ['http://localhost:1201', 'http://localhost:1202', 'http://localhost:1203'];
+    let activeIdx = 0;
+    $("#reset").click(() => {
+        console.log("it works");
+        $("#principal").val(0);
+        $("#interest_R").val(0);
+        $("#time_t").val(0);
+    });
+    function nextIdx() {
+        if (activeIdx < servers.length - 1) {
+            activeIdx += 1
+        } else {
+            activeIdx = 0;
+        }
+    }
+    function calculateAmount() {
+        let data = {
+            "principal": $("#principal").val(),
+            "interest": $("#interest_R").val() / 100,
+            "time": $("#time_t").val()
+        }
+        $.ajax({
+            method: 'POST',
+            url: servers[activeIdx] + "/calculateAmount",
+            data: data,
+            timeout: 5000,
+            error: (a, b, err) => {
+                if (err == "timeout") {
+                    nextIdx();
+                    calculateAmount();
+                }
+            }
+        }).done((data) => {
+            $("#amount").val(parseInt(data));
+        });
+    }
+    $("#calc-interest").click(() => {
+        // e.preventDefault();
+        console.log("IRC");
+        calculateAmount();
+    });
+</script>
+
+</html>
